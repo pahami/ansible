@@ -1,0 +1,8 @@
+- name: Setup nginx server
+  hosts: all
+  gather_facts: true
+  become: true
+  roles:
+    - role: common
+    - role: nginx_install
+    - role: nginx_deploy

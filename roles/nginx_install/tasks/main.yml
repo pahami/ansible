@@ -1,0 +1,28 @@
+---
+- name: Add Nginx official GPG key
+  ansible.builtin.get_url:
+    url: https://nginx.org/keys/nginx_signing.key
+    dest: "{{ nginx_repo_key }}"
+    
+- name: Add Nginx repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ nginx_repo_key }}] http://nginx.org/packages/ubuntu {{ ansible_distribution_release }} nginx"
+    state: present
+  notify: Update apt cache
+    
+- name: Set nginx package priority
+  ansible.builtin.copy:
+    dest: /etc/apt/preferences.d/99nginx
+    content: |
+      Package: *
+      Pin: origin nginx.org
+      Pin: releas o=nginx
+      Pin-Priority: 900
+
+- name: install nginx
+  ansible.builtin.apt:
+    pkg: "{{ nginx_pkgs }}"
+    state: present
+  notify: 
+    - Start Nginx   
+...

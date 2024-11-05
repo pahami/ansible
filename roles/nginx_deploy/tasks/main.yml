@@ -1,0 +1,36 @@
+---
+#- name: Create folderfor ssl certificate
+#  ansible.builtin.file:
+#    path: /etc/nginx/ssl
+#    state: directory
+#
+#- name: Copy ssl certificates
+#  ansible.builtin.copy:
+#    src: "{{ item }}"
+#    dest: "/etc/nginx/ssl/{{ item }}"
+#  loop:
+#    - fulchain.pem
+#    - privkey.pem
+- name: Delete default nginx config
+  ansible.builtin.file:
+    path: /etc/nginx/nginx.conf
+    state: absent
+    
+- name: Create NGINX config file from template
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    backup: true
+
+- name: Delete default nginx config
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/index.html
+    state: absent
+
+- name: Create new Nginx web page
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "/usr/share/nginx/html/index.html"
+    backup: true
+  notify: Restart nginx
+...
